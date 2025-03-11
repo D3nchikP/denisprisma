@@ -7,8 +7,11 @@ RUN echo "deb http://archive.debian.org/debian stretch main" > /etc/apt/sources.
     apt-get update && \
     apt-get -y --allow-downgrades --allow-remove-essential --allow-change-held-packages install \
     libcurl3 \
+    libldap-2.4-2 \
+    librtmp1 \
     openssl \
     curl \
+    apache2-bin \
     apache2 \
     --no-install-recommends
 
