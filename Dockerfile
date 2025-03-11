@@ -1,8 +1,12 @@
-# Use a lightweight base image
-FROM alpine:latest
+# Use an outdated, vulnerable base image
+FROM debian:stretch
 
-# Set a label for documentation
-LABEL maintainer="Denis"
+# Install vulnerable packages
+RUN apt-get update && apt-get install -y \
+    openssl \
+    curl \
+    apache2 \
+    --no-install-recommends
 
-# Add a simple command to show it's working
-CMD ["echo", "Hello, Prisma Cloud!"]
+# Start a simple command
+CMD ["echo", "This is a vulnerable container!"]
