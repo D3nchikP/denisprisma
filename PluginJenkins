@@ -2,30 +2,32 @@ pipeline {
     agent any
     environment {
         PRISMA_TWISTLOCK_URL = credentials('PRISMA_TWISTLOCK_URL')
-        PRISMA_ACCESS_KEY = credentials('PRISMA_ACCESS_KEY')
-        PRISMA_SECRET_KEY = credentials('PRISMA_SECRET_KEY')
     }
     stages {
         stage('Checkout Code') {
             steps {
-                git url: 'https://github.com/D3nchikP/denisprisma.git', branch: 'main'
+                git 'https://github.com/D3nchikP/denisprisma.git'
             }
         }
+        
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t denisprisma-test:v1 .'
+                script {
+                    dockerImage = docker.build("denisprisma-test:v1")
+                }
             }
         }
-        stage('Scan Docker Image with Prisma Cloud Plugin') {
+        
+        stage('Scan Docker Image with Prisma Cloud') {
             steps {
-                prismaCloudScan(
-                    image: 'denisprisma-test:v1',
-                    consoleUrl: PRISMA_TWISTLOCK_URL,
-                    accessKey: PRISMA_ACCESS_KEY,
-                    secretKey: PRISMA_SECRET_KEY,
-                    logLevel: 'debug',  // Optional: set log level to debug
-                    failOnSeverity: 'critical' // Fails the build if critical vulnerabilities are found
-                )
+                script {
+                    prismaCloudScanImage(
+                        console: PRISMA_TWISTLOCK_URL,
+                        credentialId: 'PRISMA_ACCESS_KEY',
+                        image: "denisprisma-test:v1",
+                        failOnCritical: true
+                    )
+                }
             }
         }
     }
