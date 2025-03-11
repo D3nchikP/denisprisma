@@ -2,20 +2,22 @@ pipeline {
     agent any
 
     environment {
-        PRISMA_TWISTLOCK_URL = credentials('PRISMA_TWISTLOCK_URL')
+        PRISMA_TWISTLOCK_URL = credentials('PRISMA_TWISTLOCK_URL') // Prisma Console URL
+        PRISMA_ACCESS_KEY = credentials('PRISMA_ACCESS_KEY') // Prisma API Key
+        PRISMA_SECRET_KEY = credentials('PRISMA_SECRET_KEY') // Prisma Secret Key
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/D3nchikP/denisprisma.git'
+                git 'https://github.com/D3nchikP/denisprisma.git'
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    def dockerImage = docker.build("denisprisma-test:v1")
+                    docker.build("denisprisma-test:v1")
                 }
             }
         }
@@ -24,10 +26,19 @@ pipeline {
             steps {
                 script {
                     prismaCloudScanImage(
-                        console: "${PRISMA_TWISTLOCK_URL}",
-                        credentialId: 'PRISMA_SECRET_KEY',
-                        image: "denisprisma-test:v1",
-                        failOnCritical: true
+                        dockerAddress: 'unix:///var/run/docker.sock',
+                        image: 'denisprisma-test:v1',
+                        resultsFile: 'prisma-cloud-scan-results.json'
+                    )
+                }
+            }
+        }
+
+        stage('Publish Scan Results') {
+            steps {
+                script {
+                    prismaCloudPublish(
+                        resultsFilePattern: 'prisma-cloud-scan-results.json'
                     )
                 }
             }
