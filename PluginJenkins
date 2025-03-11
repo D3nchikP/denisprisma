@@ -28,11 +28,18 @@ pipeline {
                     prismaCloudScanImage(
                         dockerAddress: 'unix:///var/run/docker.sock',
                         image: 'denisprisma-test:v1',
-                        resultsFile: 'prisma-cloud-scan-results.json'
+                        resultsFile: 'prisma-cloud-scan-results.json',
+                        ca: '',
+                        cert: '',
+                        key: PRISMA_ACCESS_KEY,  // Use Prisma API Key
+                        podmanPath: '',
+                        project: '',
+                        logLevel: 'info'
                     )
                 }
             }
         }
+
 
         stage('Publish Scan Results') {
             steps {
