@@ -1,0 +1,28 @@
+pipeline {
+    agent any
+    environment {
+        TWISTLOCK_CONSOLE_URL = 'https://us-east1.cloud.twistlock.com/us-2-158320372'
+    }
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git url: 'https://github.com/D3nchikP/denisprisma.git', branch: 'main'
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t denisprisma-test:v1 .'
+            }
+        }
+        stage('Scan Docker Image with Prisma Cloud Plugin') {
+            steps {
+                prismaCloudScanImage(
+                    console: TWISTLOCK_CONSOLE_URL,
+                    credentialId: 'PRISMA_ACCESS_KEY',
+                    image: 'denisprisma-test:v1',
+                    failOnCritical: true
+                )
+            }
+        }
+    }
+}
