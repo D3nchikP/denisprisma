@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    options {
+        ansiColor('xterm')
+    }
+
     environment {
         PRISMA_CLOUD_USER = credentials('PRISMA_ACCESS_KEY')
         PRISMA_CLOUD_PASSWORD = credentials('PRISMA_SECRET_KEY')
