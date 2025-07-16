@@ -40,7 +40,8 @@ pipeline {
                             ./twistcli images scan --address $PRISMA_CLOUD_URL \
                                 --user "$PRISMA_CLOUD_USER" \
                                 --password "$PRISMA_CLOUD_PASSWORD" \
-                                --details $IMAGE_NAME
+                                --details $IMAGE_NAME \
+                                --no-color
                         """,
                         returnStatus: true
                     )
